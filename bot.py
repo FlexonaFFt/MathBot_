@@ -2,8 +2,6 @@ import telebot #type: ignore
 import numpy as np
 import matplotlib.pyplot as plt
 import io
-from PIL import Image
-import urllib.request
 from telebot import types # type: ignore
 
 bot = telebot.TeleBot('7085664283:AAGOvJZrr1nJXIKgD2hMGkkCX8_ehURWEg0')
@@ -37,21 +35,20 @@ def get_yi(message, xi):
             result = product_inv @ x_t @ y
             a = result[0][0]
             b = result[1][0]
-            bot.send_message(message.chat.id, f'y = {b:.2f}x + {a:.2f}')
-            bot.register_next_step_handler(message, visual_graph, a, b)
+            description = f'Получаем теоретическое уравнение регрессии, имеющее следующий вид: \n\ny = {b:.2f}x + {a:.2f}'
+            x = np.linspace(-10, 10, 100)
+            y = a * x + b
+            plt.switch_backend('Agg')
+            fig = plt.figure()
+            plt.plot(x, y)
+            plt.title('Линейная регрессия')
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            buf.seek(0)
+            bot.send_photo(message.chat.id, photo=buf, caption=description)
+            plt.close(fig)
     except ValueError:
         bot.send_message(message.chat.id, "Неверный формат ввода. Пожалуйста, введите числа, разделенные пробелом.")
-
-def visual_graph(message, a, b):
-    x = np.linspace(-10, 10, 100)
-    y = a * x + b
-    fig = plt.figure()
-    plt.plot(x, y)
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    bot.send_photo(message.chat.id, photo=buf)
-    plt.close(fig)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -69,6 +66,6 @@ def start(message):
 @bot.message_handler(func=lambda message: True)
 def handle_buttons(message):
     if message.text == 'График':
-        visual_graph(message)
+        pass
 
 bot.polling()
