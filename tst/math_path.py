@@ -1,15 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels as sm
+import pandas as pd
 
 class RegressionModelXI4:
-    def __init__(self, xi1, xi2, xi3, xi4, yi):
-        self.xi1 = xi1
-        self.xi2 = xi2
-        self.xi3 = xi3
-        self.xi4 = xi4
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.read_data()
+
+    def read_data(self):
+        df = pd.read_excel(self.file_path)
+        self.yi = df.iloc[:, 0].values
+        self.xi1 = df.iloc[:, 1].values
+        self.xi2 = df.iloc[:, 2].values
+        self.xi3 = df.iloc[:, 3].values
+        self.xi4 = df.iloc[:, 4].values
         self.n = len(self.yi)
-        self.yi = yi
 
     # Коэффициент детерминации
     def kef_det(self):
@@ -125,12 +131,17 @@ class RegressionModelXI4:
                                 
 
 class RegressionModelXI3:
-    def __init__(self, xi1, xi2, xi3, yi):
-        self.xi1 = xi1
-        self.xi2 = xi2
-        self.xi3 = xi3
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.read_data()
+
+    def read_data(self):
+        df = pd.read_excel(self.file_path)
+        self.yi = df.iloc[:, 0].values
+        self.xi1 = df.iloc[:, 1].values
+        self.xi2 = df.iloc[:, 2].values
+        self.xi3 = df.iloc[:, 3].values
         self.n = len(self.yi)
-        self.yi = yi
 
     # Коэффициент детерминации
     def kef_det(self):
