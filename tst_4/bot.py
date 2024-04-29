@@ -1,4 +1,5 @@
 import telebot
+import requests
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
@@ -345,25 +346,32 @@ def handle_buttons(message):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     file_info = bot.get_file(message.document.file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    
     file_name = message.document.file_name
-    file_path = os.path.join('files', file_name)
-    
-    with open(file_path, 'wb') as new_file:
-        new_file.write(downloaded_file)
-    
-    with open(file_path, 'r') as f:
-        lines = f.readlines()
-        columns = []
-        for line in lines:
-            data = line.strip().split()
-            for i, value in enumerate(data):
-                if len(columns) <= i:
-                    columns.append([])
-                columns[i].append(value)
-    
-    data_storage[file_name] = columns
+    file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format('6437147798:AAGJ2lX2LdSZkYC35WX__96SgwcTTKscuxU', file_info.file_path))
+    data = file.content.decode('utf-8').splitlines()
+    columns = [] 
+    num_columns = 0  
+    data = file.content.decode('utf-8').splitlines()
+
+    for line in data:
+        elements = line.split()
+        if num_columns == 0:
+            num_columns = len(elements)
+            columns = [[] for _ in range(num_columns)]  # Создание списка для каждого столбца
+        for i, element in enumerate(elements):
+            columns[i].append(element)
+
+    if num_columns == 4:
+        yi = columns[0]
+        xi1 = columns[1]
+        xi2 = columns[2]
+        xi3 = columns[3] 
+    elif num_columns == 5:
+        yi = columns[0]
+        xi1 = columns[1]
+        xi2 = columns[2]
+        xi3 = columns[3]
+        xi4 = columns[4]
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = types.KeyboardButton('yi, xi1, xi2, xi3')
@@ -372,8 +380,12 @@ def handle_file(message):
     markup.add(button1)
     markup.add(button2)
     markup.add(button3)
-    bot.send_message(message.chat.id, 'Выберите способ ввода данных', reply_markup=markup)
     bot.send_message(message.chat.id, f"Данные из файла '{file_name}' были сохранены.", reply_markup=markup)
+    if num_columns == 4:
+        bot.send_message(message.chat.id, f'Получаем данные: \n{yi}, \n{xi1}, \n{xi2}, \n{xi3}')
+    elif num_columns == 5:
+        bot.send_message(message.chat.id, f'Получаем данные: \n{yi}, \n{xi1}, \n{xi2}, \n{xi3}, \n{xi4}')
+    bot.send_message(message.chat.id, 'Выберите способ ввода данных', reply_markup=markup)
 
 def kef_function_XI3(message):
     obj = RegressionModelXI3(xi1_, xi2_, xi3_, yi_)
