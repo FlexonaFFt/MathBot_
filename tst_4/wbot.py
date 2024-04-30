@@ -7,6 +7,7 @@ import pandas as pd
 import os
 from telebot import types
 
+data_storage = {}
 bot = telebot.TeleBot('6437147798:AAGJ2lX2LdSZkYC35WX__96SgwcTTKscuxU')
 
 class BotState:
@@ -32,7 +33,12 @@ class RegressionModelXI4:
     def kef_det(self):
         X = np.column_stack((np.ones(len(self.xi1)), self.xi1, self.xi2, self.xi3, self.xi4))
         model = sm.OLS(self.yi, X).fit()
-        return model.summary()
+        yi_pred = model.predict(X)
+        SST = np.sum((self.yi - np.mean(self.yi))**2)
+        SSE = np.sum((self.yi - yi_pred)**2)
+        R2 = 1 - (SSE / SST)
+        R2 = round(R2, 4)
+        return R2
 
     # Коэффициенты регрессии
     def kef_reg(self):
@@ -164,7 +170,12 @@ class RegressionModelXI3:
     def kef_det(self):
         X = np.column_stack((np.ones(len(self.xi1)), self.xi1, self.xi2, self.xi3))
         model = sm.OLS(self.yi, X).fit()
-        return model.summary()
+        yi_pred = model.predict(X)
+        SST = np.sum((self.yi - np.mean(self.yi))**2)
+        SSE = np.sum((self.yi - yi_pred)**2)
+        R2 = 1 - (SSE / SST)
+        R2 = round(R2, 4)
+        return R2
 
     # Коэффициенты регрессии
     def kef_reg(self):
@@ -344,6 +355,7 @@ def handle_buttons(message):
         kef_function_XI4(message)
 
 @bot.message_handler(content_types=['document'])
+@bot.message_handler(content_types=['document'])
 def handle_file(message):
     bot_state.set_file_sent(True)
     file_info = bot.get_file(message.document.file_id)
@@ -360,7 +372,7 @@ def handle_file(message):
             num_columns = len(elements)
             columns = [[] for _ in range(num_columns)]  # Создание списка для каждого столбца
         for i, element in enumerate(elements):
-            columns[i].append(element)
+            columns[i].append(int(element))
 
     global yi, xi1, xi2, xi3, xi4
     if num_columns == 4:
@@ -392,6 +404,7 @@ def handle_file(message):
 def kef_function_XI3(message):
     if bot_state.get_file_sent():
         obj = RegressionModelXI3(xi1, xi2, xi3, yi)
+        det = obj.kef_det()
         coefficients = obj.kef_reg()
         uravnenie = obj.regression_equation()
         obj.kef_y_()
@@ -403,16 +416,16 @@ def kef_function_XI3(message):
         obj.kef_si()
         obj.kef_coef()
         numerical_values = obj.print_numerical_values()
-        bot.send_message(message.chat.id, f'В нашем случае коэффициенты регрессии равны: \n{coefficients} \nА уравнение регрессии: \n{uravnenie} \nНормированные коэффициенты равны: \n{numerical_values}')
+        bot.send_message(message.chat.id, f'В нашем случае коэффициенты регрессии равны: \n{coefficients} \nА уравнение регрессии: \n{uravnenie} \nКоэффициент регрессии R^2: \n{det} \nНормированные коэффициенты равны: \n{numerical_values}')
         show = obj.show()
         bot.send_message(message.chat.id, f'Следовательно, можно сделать вывод: \n{show}')
     else:
         bot.send_message(message.chat.id, 'Вы не отправили файл!')
-                
 
 def kef_function_XI4(message):
     if bot_state.get_file_sent():
         obj = RegressionModelXI4(xi1, xi2, xi3, xi4, yi)
+        det = obj.kef_det()
         coefficients = obj.kef_reg()
         uravnenie = obj.regression_equation()
         obj.kef_y_()
@@ -424,11 +437,10 @@ def kef_function_XI4(message):
         obj.kef_si()
         obj.kef_coef()
         numerical_values = obj.print_numerical_values()
-        bot.send_message(message.chat.id, f'В нашем случае коэффициенты регрессии равны: \n{coefficients} \nА уравнение регрессии: \n{uravnenie} \nНормированные коэффициенты равны: \n{numerical_values}')
+        bot.send_message(message.chat.id, f'В нашем случае коэффициенты регрессии равны: \n{coefficients} \nА уравнение регрессии: \n{uravnenie} \nКоэффициент регрессии R^2: \n{det} \nНормированные коэффициенты равны: \n{numerical_values}')
         show = obj.show()
         bot.send_message(message.chat.id, f'Следовательно, можно сделать вывод: \n{show}')
     else:
         bot.send_message(message.chat.id, 'Вы не отправили файл!')
-
 
 bot.polling()
