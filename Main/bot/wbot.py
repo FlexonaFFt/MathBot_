@@ -134,7 +134,7 @@ class RegressionModelXI4:
         self.Betta_summary = self.kef_sqrt_b_summ()
         for k in range(1, 4 + 1):
             ak = self.modus[k] * (self.Betta_summary[k] / self.si)
-            ak = np.round(ak, 2)
+            ak = np.round(ak, 4)
             self.a.append(ak)
         return self.a
     
