@@ -37,6 +37,15 @@ class RegressionModel:
         print()
         print("Нормированные коэффициенты:")
         print(f"a_1 = {self.a[1]} \na_2 = {self.a[2]} \na_3 = {self.a[3]} \na_4 = {self.a[4]}")
+        print()
+        result = ''
+        if abs(self.a[0]) > abs(self.a[1]) and abs(self.a[0]) > abs(self.a[2]):
+            result += f'\nДля переменной xi1 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi2, xi3'
+        elif abs(self.a[1]) > abs(self.a[0]) and abs(self.a[1]) > abs(self.a[2]):
+            result += f'\nДля переменной xi2 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi3'
+        elif abs(self.a[2]) > abs(self.a[0]) and abs(self.a[2]) > abs(self.a[1]):
+            result += f'\nДля переменной xi3 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi2'
+        print(result)
 
 
 X = np.array([[1, 17, 130, 523, 2517], 
