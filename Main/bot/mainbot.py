@@ -13,14 +13,14 @@ class RegressionModel:
 
     def calculate_beta(self):
         self.beta = np.linalg.inv(self.X.T @ self.X) @ self.X.T @ self.y
-        self.beta = np.round(self.beta, 5)
+        self.beta = np.round(self.beta, 4)
         return self.beta
 
     def calculate_r2(self):
         self.y_pred = self.X @ self.beta
         self.SSR = np.sum((self.y_pred - np.mean(self.y)) ** 2)
         self.SST = np.sum((self.y - np.mean(self.y)) ** 2)
-        self.R2 = np.round(self.SSR / self.SST, 5)
+        self.R2 = np.round(self.SSR / self.SST, 4)
         return self.R2
 
     def calculate_normalized_coefficients(self):
