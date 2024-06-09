@@ -41,12 +41,14 @@ class RegressionModel:
         result += f"R^2 = {self.R2}\n\n"
         result += "Нормированные коэффициенты:\n"
         result += f"a_1 = {self.a[1]} \na_2 = {self.a[2]} \na_3 = {self.a[3]} \na_4 = {self.a[4]}\n"
-        if abs(self.a[0]) > abs(self.a[1]) and abs(self.a[0]) > abs(self.a[2]):
-            result += f'\nДля переменной xi1 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi2, xi3'
-        elif abs(self.a[1]) > abs(self.a[0]) and abs(self.a[1]) > abs(self.a[2]):
-            result += f'\nДля переменной xi2 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi3'
-        elif abs(self.a[2]) > abs(self.a[0]) and abs(self.a[2]) > abs(self.a[1]):
-            result += f'\nДля переменной xi3 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi2'
+        if abs(self.a[0]) > abs(self.a[1]) and abs(self.a[0]) > abs(self.a[2]) and abs(self.a[0]) > abs(self.a[3]):
+            result += f'\nДля переменной xi1 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi2, xi3, xi4'
+        elif abs(self.a[1]) > abs(self.a[0]) and abs(self.a[1]) > abs(self.a[2]) and abs(self.a[1]) > abs(self.a[3]):
+            result += f'\nДля переменной xi2 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi3, xi4'
+        elif abs(self.a[2]) > abs(self.a[0]) and abs(self.a[2]) > abs(self.a[1]) and abs(self.a[2]) > abs(self.a[3]):
+            result += f'\nДля переменной xi3 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi2, xi4'
+        elif abs(self.a[3]) > abs(self.a[0]) and abs(self.a[3]) > abs(self.a[1]) and abs(self.a[3]) > abs(self.a[2]):
+            result += f'\nДля переменной xi4 влияние на признак Y является наиболее эффективным в сравнении с действием переменных xi1, xi2, xi3'
         return result
 
 @bot.message_handler(commands=['start', 'help'])
@@ -61,10 +63,8 @@ def send_welcome(message):
 def handle_buttons(message):
         message.text == 'Инструкция' or message.text == 'инструкция'
         photo_lnk = open('img/lol.png', 'rb')
-        file1 = open('files/Тест.txt', 'rb')
         file2 = open('files/test.txt', 'rb')
-        bot.send_photo(message.chat.id, photo_lnk, 'Чтобы я мог провести для вас множественную линейную регрессию, пожалуйста, выполните следующие действия: \n\n  1) Создайте текстовый файл (например, с расширением .txt) для хранения ваших данных. \n\n  2) В каждой строке файла запишите значения переменных, разделяя их пробелами (как показано на картинке). Порядок переменных должен быть следующим:\n\n y1, x1, x2, x3, x4 или y1, x1, x2, x3 \n\n  3) После получения файла я проведу множественную линейную регрессию и предоставлю вам результаты. \n\n Вот 2 примера верного оформления файла:')
-        bot.send_document(message.chat.id, file1)
+        bot.send_photo(message.chat.id, photo_lnk, 'Чтобы я мог провести для вас множественную линейную регрессию, пожалуйста, выполните следующие действия: \n\n  1) Создайте текстовый файл (например, с расширением .txt) для хранения ваших данных. \n\n  2) В каждой строке файла запишите значения переменных, разделяя их пробелами (как показано на картинке). Порядок переменных должен быть следующим:\n\n y1, x1, x2, x3, x4 или y1, x1, x2, x3 \n\n  3) После получения файла я проведу множественную линейную регрессию и предоставлю вам результаты. \n\n Вот пример верного оформления файла:')
         bot.send_document(message.chat.id, file2)
 
 @bot.message_handler(content_types=['document'])
